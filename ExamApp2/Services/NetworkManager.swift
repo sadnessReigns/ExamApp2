@@ -18,11 +18,16 @@ class NetworkManager {
             
             (data, response, error) in
             do {
-                
-                let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as! NSArray
-                if let error = error {
-                    print("\(error.localizedDescription)")
+            
+                guard let json = try JSONSerialization.jsonObject(with: data!, options: .mutableContainers) as? NSArray else {
+                   
+                    completion([Person(age: -200, firstName: "e", lastName: "e", email: "e", gender: "e", ipAddress: "e")])
+                    print("Data Error Has Occured")
+                    return
                 }
+                if let error = error {
+                                print("\(error.localizedDescription)")
+                            }
                 
                 var jsonDict: [String:Any] = [:]
                 

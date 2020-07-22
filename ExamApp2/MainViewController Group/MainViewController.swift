@@ -13,8 +13,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
     static let layout = UICollectionViewFlowLayout()
     
     var collectionViewRefreshControl: UIRefreshControl = UIRefreshControl()
-    
-    var urlSession: URLSession!
+     var urlSession: URLSession!
     let nm = NetworkManager()
     let fm = FilterManager()
     
@@ -50,25 +49,19 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
             collectionView.reloadData()
         }
     }
- 
     
+
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        
         self.setupToolbars()
         self.collectionView.isHidden = true
         
         loadIndicator.center = view.center
         loadIndicator.isHidden = false
         loadIndicator.startAnimating()
-        self.nm.getPeople(urlSession: self.urlSession) { result in
-                     self.currentPeople = result
-                     self.allPeople = result
-                      MainViewController.layout.itemSize = CGSize(width: self.collectionView.frame.width, height: 96)
-            self.loadIndicator.stopAnimating()
-            self.loadIndicator.isHidden = true
-            self.collectionView.isHidden = false
-                 }
+     
+        loadPeople()
         
         self.collectionViewRefreshControl = UIRefreshControl()
         self.collectionView.alwaysBounceVertical = true
@@ -81,7 +74,7 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
         self.collectionView.addSubview(collectionViewRefreshControl)
         
         self.setupCollectionView()
-
+        
         segmentedGenderControl.selectedSegmentIndex = 2
         
         self.segmentedPresentationControl.selectedSegmentIndex = 0
@@ -94,17 +87,33 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
     }
     
     
+    func loadPeople() {
+        self.nm.getPeople(urlSession: self.urlSession) { result in
+                 
+                 if result[0].age != -200 {
+                     self.currentPeople = result
+                     self.allPeople = result
+                     MainViewController.layout.itemSize = CGSize(width: self.collectionView.frame.width, height: 96)
+                     self.loadIndicator.stopAnimating()
+                     self.loadIndicator.isHidden = true
+                     self.collectionView.isHidden = false
+                 } else {
+                     let alertController = UIAlertController(title: "JSON Error", message: "Data Error Has Occured", preferredStyle: .alert)
+                     let alertAction = UIAlertAction(title: "OK", style: .default, handler: .none)
+                     alertController.addAction(alertAction)
+                     self.present(alertController, animated: true)
+                    self.loadIndicator.isHidden = true
+                  
+                  }
+             }
+    }
     
     @objc func handleRefresh() {
         allPeople.removeAll()
         currentPeople.removeAll()
         
-        nm.getPeople(urlSession: urlSession ) { result in
-            self.allPeople = result
-            self.currentPeople = result
-            self.collectionViewRefreshControl.endRefreshing()
-            
-        }
+       loadPeople()
+        
         segmentedGenderControl.selectedSegmentIndex = 2
         self.collectionView.reloadData()
         
@@ -171,46 +180,46 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
 }
 
 extension MainViewController {
-
-       func numberOfSections(in collectionView: UICollectionView) -> Int {
-           return 1
-       }
-       
-       func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-           return currentPeople.count
-       }
-       
-       func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-           switch self.segmentedPresentationControl.selectedSegmentIndex {
-           case 0 : return CGSize(width: 128, height: 128)
-           case 1 : return CGSize(width: 400, height: 128)
-           default: return CGSize(width: 400, height: 400)
-           }
-           
-       }
-       
-       func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-           
-           let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)  as? CollectionViewPersonCell
-           cell?.person(person: currentPeople[indexPath.row])
-           self.myCells.append(cell!)
-           return cell!
-       }
-       
-       
-       
-       func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     
-           let vcToPop = FullInfoViewController()
-           vcToPop.currentPerson = currentPeople[indexPath.row]
-           vcToPop.modalPresentationStyle = .popover
-                  show(vcToPop, sender: self)
-                  
-                  if vcToPop.isViewLoaded {
-                      collectionView.deselectItem(at: indexPath, animated: true)
-                  }
-       }
-       
+    func numberOfSections(in collectionView: UICollectionView) -> Int {
+        return 1
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return currentPeople.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        switch self.segmentedPresentationControl.selectedSegmentIndex {
+        case 0 : return CGSize(width: 128, height: 128)
+        case 1 : return CGSize(width: 400, height: 128)
+        default: return CGSize(width: 400, height: 400)
+        }
+        
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)  as? CollectionViewPersonCell
+        cell?.person(person: currentPeople[indexPath.row])
+        self.myCells.append(cell!)
+        return cell!
+    }
+    
+    
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        
+        let vcToPop = FullInfoViewController()
+        vcToPop.currentPerson = currentPeople[indexPath.row]
+        vcToPop.modalPresentationStyle = .popover
+        show(vcToPop, sender: self)
+        
+        if vcToPop.isViewLoaded {
+            collectionView.deselectItem(at: indexPath, animated: true)
+        }
+    }
+    
 }
 
 

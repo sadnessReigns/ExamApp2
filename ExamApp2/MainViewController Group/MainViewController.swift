@@ -166,45 +166,51 @@ class MainViewController: UIViewController, UICollectionViewDelegate, UICollecti
     }
     
     
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return currentPeople.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        switch self.segmentedPresentationControl.selectedSegmentIndex {
-        case 0 : return CGSize(width: 128, height: 128)
-        case 1 : return CGSize(width: 400, height: 128)
-        default: return CGSize(width: 400, height: 400)
-        }
-        
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)  as? CollectionViewPersonCell
-        cell?.person(person: currentPeople[indexPath.row])
-        self.myCells.append(cell!)
-        return cell!
-    }
     
     
+}
+
+extension MainViewController {
+
+       func numberOfSections(in collectionView: UICollectionView) -> Int {
+           return 1
+       }
+       
+       func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+           return currentPeople.count
+       }
+       
+       func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+           switch self.segmentedPresentationControl.selectedSegmentIndex {
+           case 0 : return CGSize(width: 128, height: 128)
+           case 1 : return CGSize(width: 400, height: 128)
+           default: return CGSize(width: 400, height: 400)
+           }
+           
+       }
+       
+       func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+           
+           let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath as IndexPath)  as? CollectionViewPersonCell
+           cell?.person(person: currentPeople[indexPath.row])
+           self.myCells.append(cell!)
+           return cell!
+       }
+       
+       
+       
+       func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
     
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
- 
-        let vcToPop = FullInfoViewController()
-        vcToPop.currentPerson = currentPeople[indexPath.row]
-        vcToPop.modalPresentationStyle = .popover
-               show(vcToPop, sender: self)
-               
-               if vcToPop.isViewLoaded {
-                   collectionView.deselectItem(at: indexPath, animated: true)
-               }
-    }
-    
+           let vcToPop = FullInfoViewController()
+           vcToPop.currentPerson = currentPeople[indexPath.row]
+           vcToPop.modalPresentationStyle = .popover
+                  show(vcToPop, sender: self)
+                  
+                  if vcToPop.isViewLoaded {
+                      collectionView.deselectItem(at: indexPath, animated: true)
+                  }
+       }
+       
 }
 
 
